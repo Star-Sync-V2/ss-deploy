@@ -2,12 +2,18 @@ name: star-sync
 
 services:
     ss-core:
-        image: ghcr.io/star-sync/ss-core:${SS_CORE_VERSION}
+        build:
+            context: ../../ss-core
+            dockerfile: docker/Dockerfile.dev
         ports:
             - "${SS_CORE_PORT}:${SS_CORE_INTERNAL_PORT}"
         env_file: ".env"
         networks:
             - star-sync
+        volumes:
+            - ../../ss-core/app:/opt/app
+            - ../../ss-core/requirements.txt:/opt/app/requirements.txt
+
 
     ss-web:
         image: ghcr.io/star-sync/ss-web:${SS_WEB_VERSION}
@@ -18,7 +24,8 @@ services:
             - star-sync
 
     ss-db:
-        image: postgres:latest
+        #image: postgres:latest
+        image: postgres:15
         env_file: ".env"
         ports:
             - "${POSTGRES_PORT}:5432"
