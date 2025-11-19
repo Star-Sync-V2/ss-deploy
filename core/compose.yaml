@@ -11,7 +11,7 @@ services:
         networks:
             - star-sync
         volumes:
-            - ../../ss-core/app:/opt/app
+            - ../../ss-core/app
             - ../../ss-core/requirements.txt:/opt/app/requirements.txt
 
 
