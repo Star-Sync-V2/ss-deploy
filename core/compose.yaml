@@ -2,23 +2,42 @@ name: star-sync
 
 services:
     ss-core:
-        image: ghcr.io/star-sync/ss-core:${SS_CORE_VERSION}
+        build:
+            context: ../../ss-core
+            dockerfile: docker/Dockerfile.dev
+        command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
         ports:
             - "${SS_CORE_PORT}:${SS_CORE_INTERNAL_PORT}"
         env_file: ".env"
         networks:
             - star-sync
+        volumes:
+            - ../../ss-core/app:/opt/app/app
+            - ../../ss-core/requirements.txt:/opt/app/requirements.txt
+
 
     ss-web:
-        image: ghcr.io/star-sync/ss-web:${SS_WEB_VERSION}
+        build:
+            context: ../../ss-web
+            dockerfile: docker/Dockerfile.dev
         ports:
             - "${SS_WEB_PORT}:${SS_WEB_INTERNAL_PORT}"
         env_file: ".env"
         networks:
             - star-sync
+        volumes:
+            - ../../ss-web/src:/app/src
+            - ../../ss-web/public:/app/public
+            - ../../ss-web/package.json:/app/package.json
+            - ../../ss-web/package-lock.json:/app/package-lock.json
+            - ../../ss-web/next.config.mjs:/app/next.config.mjs
+            - ../../ss-web/tailwind.config.ts:/app/tailwind.config.ts
+            - ../../ss-web/tsconfig.json:/app/tsconfig.json
+            - ../../ss-web/postcss.config.mjs:/app/postcss.config.mjs
 
     ss-db:
-        image: postgres:latest
+        #image: postgres:latest
+        image: postgres:15
         env_file: ".env"
         ports:
             - "${POSTGRES_PORT}:5432"
